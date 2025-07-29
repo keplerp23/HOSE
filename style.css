@@ -1,0 +1,59 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f8f9fa !important;
+  color: #333;
+}
+
+#searchInput {
+  padding: 8px;
+  width: 300px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+table#dataTable {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: auto;
+  font-size: 12px;
+}
+
+table#dataTable th,
+table#dataTable td {
+  border: 1px solid #666666;
+  padding: 8px;
+  word-wrap: break-word;
+  text-align: left;
+}
+
+table#dataTable th {
+  background-color: #0074D9;
+  color: white;
+}
+
+table#dataTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#loadMoreBtn {
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #0074D9; /* same blue as your table headers */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  display: block;
+}
+
+#loadMoreBton:hover {
+  background-color: #005fa3;
+}
+
+#loadMoreBtn {
+  margin-left: auto;
+  margin-right: auto;
+}

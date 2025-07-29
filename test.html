@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>API Fetch Test</title>
+</head>
+<body>
+  <h1>API Fetch Test</h1>
+  <pre id="output">Loading...</pre>
+
+  <script>
+    fetch("http://127.0.0.1:8000/data?limit=5")
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      })
+      .catch(err => {
+        document.getElementById("output").textContent = "Fetch error: " + err.message;
+      });
+  </script>
+</body>
+</html>

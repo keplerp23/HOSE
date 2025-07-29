@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>HOSE</title>
+</head>
+<body>
+  <h1>HOSE Stats Base File</h1>
+  <input type="text" id="searchInput" placeholder="Search any field...">
+  <table id="dataTable">
+    <thead id="tableHead"></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <button id="loadMoreBtn">Load More Rows</button>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000/data";
+    let originalData = [];
+    let currentOffset = 0;
+    const rowsPerPage = 50;
+
+    const tableHead = document.getElementById("tableHead");
+    const tableBody = document.getElementById("tableBody");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+    function buildTableRows(data, append = false) {
+      if (!append) {
+        tableHead.innerHTML = "";
+        tableBody.innerHTML = "";
+      }
+
+      if (data.length === 0 && !append) {
+        tableBody.innerHTML = "<tr><td colspan='100%'>No data found</td></tr>";
+        return;
+      }
+
+      const headers = Object.keys(data[0]);
+
+      if (!append) {
+        const headerRow = document.createElement("tr");
+        headers.forEach(header => {
+          const th = document.createElement("th");
+          th.textContent = header;
+          headerRow.appendChild(th);
+        });
+        tableHead.appendChild(headerRow);
+      }
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        headers.forEach(header => {
+          const td = document.createElement("td");
+          td.textContent = row[header];
+          tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function loadNextBatch() {
+      fetch(`${API_URL}?limit=${rowsPerPage}&offset=${currentOffset}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length > 0) {
+            originalData = originalData.concat(data);
+            buildTableRows(data, true);  // append = true
+            currentOffset += data.length;
+          } else {
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.textContent = "No more data";
+          }
+        })
+        .catch(err => {
+          tableBody.innerHTML = `<tr><td colspan="100%">Error loading data: ${err.message}</td></tr>`;
+        });
+    }
+
+    // Initial load
+    loadNextBatch();
+
+    // Search filter
+    document.getElementById("searchInput").addEventListener("input", e => {
+      const query = e.target.value.toLowerCase();
+      const filtered = originalData.filter(row =>
+        Object.values(row).some(val =>
+          String(val).toLowerCase().includes(query)
+        )
+      );
+      buildTableRows(filtered, false);
+    });
+
+    // Load more button
+    loadMoreBtn.addEventListener("click", loadNextBatch);
+  </script>
+
+  <script>
+    
+    function buildTable(data) {
+      const tableHead = document.getElementById("tableHead");
+      const tableBody = document.getElementById("tableBody");
+
+      tableHead.innerHTML = "";
+      tableBody.innerHTML = "";
+
+      if (data.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='100%'>No data found</td></tr>";
+        return;
+      }
+
+      // Create header row
+      const headers = Object.keys(data[0]);
+      const headerRow = document.createElement("tr");
+      headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+      });
+      tableHead.appendChild(headerRow);
+
+      // Create data rows
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        headers.forEach(header => {
+          const td = document.createElement("td");
+          td.textContent = row[header];
+          tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function filterTable(query) {
+      const lowerQuery = query.toLowerCase();
+      const filtered = originalData.filter(row =>
+        Object.values(row).some(val =>
+          String(val).toLowerCase().includes(lowerQuery)
+        )
+      );
+      buildTable(filtered);
+    }
+
+    // Load data
+    fetch(API_URL)
+      .then(res => {
+        if (!res.ok) throw new Error("Fetch failed");
+        return res.json();
+      })
+      .then(data => {
+        originalData = data;
+        buildTable(originalData.slice(0, 50)); // Show first 50 rows
+      })
+      .catch(err => {
+        document.getElementById("tableBody").innerHTML = `<tr><td colspan="100%">Error loading data: ${err.message}</td></tr>`;
+      });
+
+    // Hook up search
+    document.getElementById("searchInput").addEventListener("input", e => {
+      filterTable(e.target.value);
+    });
+  </script>
+</body>
+</html>
